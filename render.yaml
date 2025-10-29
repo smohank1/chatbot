@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: rag-chatbot
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: OPENAI_API_KEY
+        sync: false  # This means you'll set it manually in Render dashboard
