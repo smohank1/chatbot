@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify, send_from_directory
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 from llama_index.vector_stores.chroma import ChromaVectorStore
 from llama_index.core import StorageContext
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.llms.openai import OpenAI
 import chromadb
-import openai
 import os
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
@@ -14,10 +15,14 @@ load_dotenv()
 
 # Get OpenAI API key from environment
 # This works both locally (.env file) and on Render (environment variables)
-openai.api_key = os.getenv('OPENAI_API_KEY') or os.getenv('MYKEY')
+api_key = os.getenv('OPENAI_API_KEY') or os.getenv('MYKEY')
 
-if not openai.api_key:
+if not api_key:
     print("WARNING: OpenAI API key not found in environment variables!")
+else:
+    # Configure LlamaIndex Settings with OpenAI
+    Settings.llm = OpenAI(api_key=api_key, model="gpt-3.5-turbo")
+    Settings.embed_model = OpenAIEmbedding(api_key=api_key)
 
 # Initialize Flask app
 app = Flask(__name__, static_folder='.')
